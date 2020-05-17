@@ -165,7 +165,7 @@ def create_per_second_data(pid_filename, metric_no):
 	full_frame = np.array(full_frame)
 
 	# Pickling this data
-	filename = str(str(FeatureType[Features(metric_no)]) + '_all_per_sec_all_axis.pkl')
+	filename = str('Pickles/' + str(FeatureType[Features(metric_no)]) + '_all_per_sec_all_axis.pkl')
 	outfile = open(filename,'wb')
 	pickle.dump(full_frame,outfile)
 	outfile.close()
@@ -230,10 +230,10 @@ def create_per_window_data(filename, metric_no):
 		print("df2 created !!!!")
 
 		result_df = pd.concat([df1, df2], axis=1)
-		outputFileName = "Metric_" + str(metric_no) + "_36.pkl"
+		outputFileName = "Pickles/Metric_" + str(metric_no) + "_36.pkl"
 	else:
 		result_df = df1
-		outputFileName = "Metric_" + str(metric_no) + "_18.pkl"
+		outputFileName = "Pickles/Metric_" + str(metric_no) + "_18.pkl"
 	
 	print(result_df.shape)
 
@@ -246,7 +246,6 @@ def create_per_window_data(filename, metric_no):
 
 if __name__ == "__main__":
 	# pids = seperate_pid_data()
-
 	pidFile = 'data/BK7610'
 	for i in Features:
 		if i.value == 12: continue

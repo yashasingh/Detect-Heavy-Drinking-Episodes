@@ -6,13 +6,11 @@ from sklearn.ensemble import RandomForestClassifier
 import collections
 import matplotlib.pyplot as plt
 
+
 def add_labels_cleanTAC():
-
 	# Read the clean tac, append label corresponding to TAC threshold
-
 	labels = list()
 	clean_tac = pd.read_csv("data/BK7610_clean_TAC.csv")
-
 
 	tot_rows = len(clean_tac)
 	for i in range(tot_rows):
@@ -24,21 +22,18 @@ def add_labels_cleanTAC():
 
 	print("Clean tac shape",clean_tac.shape)
 	del clean_tac['TAC_Reading']
-
 	clean_tac.to_csv('data/BK7610_label.csv', encoding='utf-8')
+
 	return 'BK7610_label.csv'
 
 
 def find_ts_labels():
-
 	# Generate TAC label for all rows corresponding its Timestamp
-
 	clean_tac = pd.read_csv("data/BK7610_label.csv")
 
 	# Contains timestamp with second values
 	clean_ts = clean_tac.loc[:, 'timestamp'] 
 
-	
     # Read Pickle
 	infile = open("Pickles/Metric_4_36.pkl",'rb')
 	fea = pickle.load(infile)
@@ -48,9 +43,7 @@ def find_ts_labels():
 	fea_ts = fea.loc[:, 't']//1000
 
 	all_labels = list()
-		
 	offset_tac, offset_fea = 0, 0
-
 	while offset_tac < len(clean_ts) and offset_fea < len(fea_ts):
 		
 		while fea_ts[offset_fea] < clean_ts[offset_tac]:
@@ -61,14 +54,13 @@ def find_ts_labels():
 				break
 
 		offset_tac += 1
-	# print(all_labels)
+
 	print("All labels: ", collections.Counter(i[0] for i in all_labels))
 
 	return all_labels
 
 
 def combine_features():
-
 	infile = open("Pickles/Metric_0_36.pkl",'rb')
 	df = pickle.load(infile)
 	infile.close()
@@ -85,19 +77,15 @@ def combine_features():
 
 		df = df.join(x.set_index('t'), on='t')
 
-	# print(df.shape)
 	del df['t']
-	# print(df.head(3))
-
 	outfile = open("X.pkl",'wb')
 	pickle.dump(df, outfile)
 	outfile.close()
 
 	return df
 
-def classifier(X, y):
-	
 
+def classifier(X, y):
 	zipped= list(zip(X.values, np.array(y)))	
 	random.shuffle(zipped)
 	X, y  = zip(*zipped)
@@ -118,12 +106,9 @@ def classifier(X, y):
 	clf = RandomForestClassifier(n_estimators = 700)
 	
 	clf.fit(train_data, train_label)
-	print("Fitted")
-
 	y_pred = clf.predict(test_data)
 
 	score = np.mean(y_pred == test_label)
-
 	# score = clf.score(test_data, test_label)
 	print("Score:", score)
 
