@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.stats import skew, kurtosis
+from scipy.stats import skew
 from scipy.signal import welch
 
 eps = 0.00000001
@@ -101,33 +101,9 @@ def skewness(signal):
 
 
 def avg_power(signal):
-    return np.mean(welch(signal, 40))
+    _, power = welch(signal, 40)
+    return np.mean(power)
 
 
 def rms(signal):
     return np.sqrt(np.mean(signal ** 2))
-
-
-# Features
-#1  Mean
-#2  Standard Deviation
-#3  Median
-#4  Zero Crossing Rate
-#5  Max/Min, Raw/Abs
-#6  Spectral Entropy
-#7  Spectral Centroid
-#8  Spectral Spread
-#10 Spectral Roll-off
-#11 Max Frequency
-#16 Skewness
-#17 Kurtosis
-#18 Average Power
-
-#9  Spectral Flux
-#12 Gait Stretch
-#13 Number of Steps
-#14 Step Time
-#15 Cadence
-#19 Spectral Peak Ratio
-#20 RMS
-#21 MFCC Covariance

@@ -1,13 +1,15 @@
 import csv
 import numpy as np 
 import pandas as pd
-from datetime import datetime
 import pickle
 import statistics
 import utility
-from scipy.fftpack import fft
 import enum
+
+from datetime import datetime
+from scipy.fftpack import fft
 from scipy.stats import kurtosis
+
 
 class Features(enum.Enum):
 	Mean = 0
@@ -29,7 +31,6 @@ class Features(enum.Enum):
 	Skewness = 15
 	Kurtosis = 16
 	Avg_Power = 17
-	RMS = 18
 
 
 FeatureType = {}
@@ -92,10 +93,10 @@ def create_per_second_data(pid_filename, metric_no):
 			metrics_axis = []
 
 			# if count == 0:
-				# fft_magnitude_previous[0] = 0
-				# fft_magnitude_previous[1] = 0
-				# fft_magnitude_previous[2] = 0
-				# count += 1
+			# 	fft_magnitude_previous[0] = 0
+			# 	fft_magnitude_previous[1] = 0
+			# 	fft_magnitude_previous[2] = 0
+			# 	count += 1
 
 			# Add the last timstamp in that second window
 			metrics_axis.append(sub_frame[-1, 0])
@@ -121,23 +122,35 @@ def create_per_second_data(pid_filename, metric_no):
 				elif metric_no == Features.Spec_Ent_Time.value:
 					metrics_axis.append(utility.spectral_entropy(sub_frame[:, col]))
 				elif metric_no == Features.Spec_Ent_Freq.value:
-					fft_magnitude = abs(fft(sub_frame[:, col]).real)
+					fft_magnitude = abs(fft(sub_frame[:, col]))
+					fft_magnitude = fft_magnitude[0:int(sub_frame.shape[0]/2)]
+					fft_magnitude = fft_magnitude / len(fft_magnitude)
 					metrics_axis.append(utility.spectral_entropy(fft_magnitude))
 				elif metric_no == Features.Spec_Cent.value:
-					fft_magnitude = abs(fft(sub_frame[:, col]).real)
+					fft_magnitude = abs(fft(sub_frame[:, col]))
+					fft_magnitude = fft_magnitude[0:int(sub_frame.shape[0]/2)]
+					fft_magnitude = fft_magnitude / len(fft_magnitude)
 					metrics_axis.append(utility.spectral_centroid(fft_magnitude))
 				elif metric_no == Features.Spec_Sprd.value:
-					fft_magnitude = abs(fft(sub_frame[:, col]).real)
+					fft_magnitude = abs(fft(sub_frame[:, col]))
+					fft_magnitude = fft_magnitude[0:int(sub_frame.shape[0]/2)]
+					fft_magnitude = fft_magnitude / len(fft_magnitude)
 					metrics_axis.append(utility.spectral_spread(fft_magnitude))
 				# elif metric_no == Features.Spec_Flux.value:
-					# fft_magnitude = abs(fft(sub_frame[:, col]).real)
+					# fft_magnitude = abs(fft(sub_frame[:, col]))
+					# fft_magnitude = fft_magnitude[0:sub_frame.shape[0]/2]
+					# fft_magnitude = fft_magnitude / len(fft_magnitude)
 					# metrics_axis.append(utility.spectral_flux(fft_magnitude, fft_magnitude_previous[col-1]))
 					# fft_magnitude_previous[col-1] = fft_magnitude.copy()
 				elif metric_no == Features.Spec_RollOff.value:
-					fft_magnitude = abs(fft(sub_frame[:, col]).real)
+					fft_magnitude = abs(fft(sub_frame[:, col]))
+					fft_magnitude = fft_magnitude[0:int(sub_frame.shape[0]/2)]
+					fft_magnitude = fft_magnitude / len(fft_magnitude)
 					metrics_axis.append(utility.spectral_rolloff(fft_magnitude))
 				elif metric_no == Features.Max_freq.value:
-					fft_magnitude = abs(fft(sub_frame[:, col]).real)
+					fft_magnitude = abs(fft(sub_frame[:, col]))
+					fft_magnitude = fft_magnitude[0:int(sub_frame.shape[0]/2)]
+					fft_magnitude = fft_magnitude / len(fft_magnitude)
 					metrics_axis.append(max(fft_magnitude))
 				elif metric_no == Features.Skewness.value:
 					metrics_axis.append(utility.skewness(sub_frame[:, col]))
@@ -233,10 +246,9 @@ def create_per_window_data(filename, metric_no):
 
 if __name__ == "__main__":
 	# pids = seperate_pid_data()
-	features, pid = ["Mean", "Median", "Std_Dev", "ZeroCrsRate", "Max_Raw", "Min_Raw", "Max_Abs", "Min_Abs",
-	"Spec_Ent_Time", "Spec_Ent_Freq", "Spec_Cent", "Spec_Sprd", "Spec_Flux", "Spec_RollOff", "Max_freq",
-	"Skewness", "Kurtosis", "Avg_Power"], 'BK7610'
-	for i,_ in enumerate(features):
-		if i == 12: continue
-		filename = create_per_second_data(pid, i)
-		filename = create_per_window_data(filename, i)
+
+	pidFile = 'data/BK7610'
+	for i in Features:
+		if i.value == 12: continue
+		filename = create_per_second_data(pidFile, i.value)
+		filename = create_per_window_data(filename, i.value)
